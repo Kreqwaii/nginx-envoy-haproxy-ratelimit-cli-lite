@@ -1,0 +1,30 @@
+static_resources:
+  listeners:
+    - name: listener_0
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 443
+      filter_chains:
+        - transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              common_tls_context:
+                tls_params:
+                  tls_minimum_protocol_version: TLSv1_0
+          filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                route_config:
+                  virtual_hosts:
+                    - name: local_service
+                      cors:
+                        allow_origin_string_match:
+                          - exact: "*"
+                        allow_credentials: true
+                http_filters:
+                  - name: envoy.filters.http.cors
+                  - name: envoy.filters.http.router
+  clusters:
+    - name: service_backend
+      type: STRICT_DNS
